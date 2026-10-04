@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure Landing Zones — Ecosystem Explorer</title>
+<meta name="description" content="Explore Azure Landing Zones in 3D: Platform Services, Platform Landing Zones, and Application Landing Zones.">
+<link rel="stylesheet" href="styles.css?v=3">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","lucide":"https://cdn.jsdelivr.net/npm/lucide@0.468.0/+esm"}}</script>
+</head>
+<body>
+  <div class="alz-explorer">
+    <header class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" class="brand-icon" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Zm0 8-10 5 10 5 10-5-10-5Z" fill="currentColor"/></svg>
+        <span>Azure Landing Zones<span class="brand-caption">Ecosystem Explorer</span></span>
+      </div>
+      <button class="quiet-button" id="help-button">How to explore <span class="key">?</span></button>
+    </header>
+
+    <main class="workspace">
+      <aside class="navigation" aria-label="Architecture navigation">
+        <div class="nav-heading"><span>ARCHITECTURE</span><span id="component-count" class="count"></span></div>
+        <button id="overview-button" class="overview-button active" aria-current="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>
+          Full ecosystem
+        </button>
+        <div class="nav-section-label">LANDING ZONE LAYERS</div>
+        <nav id="layer-nav" aria-label="Layers"></nav>
+        <div class="nav-bottom">
+          <p>Cloud Adoption Framework<br>Platform foundations. Workload autonomy.</p>
+          <a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/" target="_blank" rel="noopener noreferrer">Reference architecture
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7m0-7L10 14M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></svg>
+          </a>
+        </div>
+      </aside>
+
+      <section class="viewport" aria-label="Interactive 3D architecture">
+        <div class="scene-heading">
+          <div id="breadcrumbs" class="breadcrumbs"><span>PLATFORM OVERVIEW</span></div>
+          <h1 id="scene-title">Azure Landing Zones</h1>
+          <p id="scene-subtitle">Click a layer or component to explore.</p>
+        </div>
+        <div class="view-tools">
+          <button class="icon-button" id="reset-view" title="Reset camera" aria-label="Reset camera"><i data-lucide="rotate-ccw"></i></button>
+          <button class="icon-button" id="zoom-in" title="Zoom in" aria-label="Zoom in"><i data-lucide="plus"></i></button>
+          <button class="icon-button" id="zoom-out" title="Zoom out" aria-label="Zoom out"><i data-lucide="minus"></i></button>
+          <span class="view-label">ISO</span>
+        </div>
+        <div id="scene" tabindex="0"></div>
+        <div id="hover-label" role="tooltip" hidden></div>
+        <div id="loading" role="status"><span class="loader-ring"></span>Building the architecture</div>
+
+        <div class="scene-legend">
+          <span><i class="legend-dot"></i><span id="scene-status">4 layers · 11 components</span></span>
+        </div>
+
+        <div class="bottom-controls">
+          <div class="assembly-controls">
+            <div class="segmented" aria-label="Layer arrangement">
+              <button id="stacked-button" aria-pressed="false">Stacked</button>
+              <button id="exploded-button" aria-pressed="true">Exploded</button>
+            </div>
+            <div class="separation">
+              <label for="separation">Separation</label>
+              <input id="separation" type="range" min="0" max="100" value="70">
+              <output id="separation-value" for="separation">70%</output>
+            </div>
+          </div>
+          <div class="gesture-hint">
+            <span>Drag to orbit</span><span>Scroll to zoom</span><span>Click to inspect</span>
+          </div>
+        </div>
+      </section>
+
+      <aside id="inspector" class="inspector" aria-label="Component details">
+        <div class="inspector-header"><span id="inspector-eyebrow">FIELD GUIDE</span><span id="discovery-count">0 explored</span></div>
+        <div id="detail-content" aria-live="polite"></div>
+      </aside>
+    </main>
+
+    <div class="statusbar">
+      <span><span class="status-indicator"></span><span id="footer-status">Interactive architecture</span></span>
+      <span>Conceptual model <span class="footer-divider">/</span> Azure Landing Zones architecture</span>
+    </div>
+  </div>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-top"><span class="eyebrow">EXPLORER CONTROLS</span><button id="close-help" class="icon-button" aria-label="Close help" title="Close help"><i data-lucide="x"></i></button></div>
+    <h2 id="help-title">Get a closer look</h2>
+    <p>Pull the platform apart, then select a component to see its role and connections.</p>
+    <dl class="help-list">
+      <div><dt>Rotate</dt><dd>Drag the model.</dd></div>
+      <div><dt>Zoom</dt><dd>Scroll, pinch, or use the + and − buttons.</dd></div>
+      <div><dt>Inspect</dt><dd>Click a component. The layer list offers the same controls.</dd></div>
+      <div><dt>Step back</dt><dd>Use the breadcrumbs to return to the full ecosystem.</dd></div>
+    </dl>
+    <p class="help-note">This is a conceptual architecture based on the Cloud Adoption Framework for Azure Landing Zones. Governance (Policy, identity, and access management) applies across every layer.</p>
+    <button id="help-done" class="primary-button">Explore the architecture</button>
+  </dialog>
+
+  <noscript><div class="noscript-message">This explorer needs JavaScript.</div></noscript>
+
+  <script type="module" src="app.js?v=41"></script>
+</body>
+</html>
