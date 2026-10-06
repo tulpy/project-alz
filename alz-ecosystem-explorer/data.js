@@ -74,7 +74,7 @@ export const LAYERS = [
     components: [
       {
         id: 'connectivity',
-        name: 'Connectivity',
+        name: 'Connectivity LZ',
         icon: 'hub',
         summary: 'Hub network providing shared connectivity, firewalling, and DNS for all spokes.',
         details: 'A hub virtual network hosts Azure Firewall, VPN/ExpressRoute gateways, and private DNS resolution. Application landing zone spokes peer into this hub for controlled north-south and east-west traffic.',
@@ -83,7 +83,7 @@ export const LAYERS = [
       },
       {
         id: 'management',
-        name: 'Management',
+        name: 'Management LZ',
         icon: 'monitor',
         summary: 'Centralized monitoring, logging, and operations for the whole estate.',
         details: 'Log Analytics workspaces, Azure Monitor, Update/Change management, and Backup are deployed once and consumed by every platform and application landing zone for consistent operations.',
@@ -92,7 +92,7 @@ export const LAYERS = [
       },
       {
         id: 'identity',
-        name: 'Identity',
+        name: 'Identity LZ',
         icon: 'id',
         summary: 'Directory services and identity tiering underpinning access to every layer.',
         details: 'Microsoft Entra ID, optional Active Directory Domain Services, Privileged Identity Management, and Conditional Access provide the authentication and authorization backbone consumed by identity and access management and every workload.',
@@ -101,7 +101,7 @@ export const LAYERS = [
       },
       {
         id: 'security',
-        name: 'Security',
+        name: 'Security LZ',
         icon: 'shield',
         summary: 'Central security controls and posture management protect the Azure estate.',
         details: 'A centralized security function coordinates cloud security posture, threat detection, vulnerability assessment, and incident response across the platform and landing zones, integrating with identity, monitoring, and policy controls.',

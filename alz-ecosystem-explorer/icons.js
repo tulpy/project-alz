@@ -120,7 +120,7 @@ const DRAWERS = {
 export function buildTileTexture(component, hexColor) {
   const canvas = document.createElement('canvas');
   canvas.width = 384;
-  canvas.height = 422;
+  canvas.height = 384;
   const ctx = canvas.getContext('2d');
   const color = `#${hexColor.toString(16).padStart(6, '0')}`;
   ctx.fillStyle = '#18212d';
@@ -188,7 +188,7 @@ export function buildLayerTexture(layer, number) {
   ctx.fillStyle = '#ffffff';
   ctx.font = '600 36px "Segoe UI", sans-serif';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${String(number).padStart(2, '0')}  /  ${layer.name.toUpperCase()}`, 24, 48);
+  ctx.fillText(`${String(number).padStart(2, '0')}  |  ${layer.name.toUpperCase()}`, 24, 48);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 4;

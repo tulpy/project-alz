@@ -25,7 +25,7 @@ a { color: var(--accent); }
 .alz-explorer { display: flex; flex-direction: column; height: 100vh; height: 100dvh; min-height: 640px; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; padding: 16px 26px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); }
 .brand { display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 650; }
-.brand-icon { width: 32px; height: 32px; color: var(--accent); flex-shrink: 0; }
+.brand-logo { width: 104px; height: 27px; object-fit: contain; flex: 0 0 auto; }
 .brand-caption { display: block; margin-top: 3px; font-size: 11px; font-weight: 400; color: var(--text-dim); }
 .quiet-button { display: flex; align-items: center; gap: 12px; flex-shrink: 0; background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 9px 12px; border-radius: var(--radius); font-size: 12px; }
 .quiet-button .key { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid #454957; border-radius: 50%; font-size: 11px; }
@@ -67,7 +67,6 @@ a { color: var(--accent); }
 .icon-button { width: 32px; height: 32px; border-radius: 5px; border: 1px solid var(--border); background: #10141ed9; color: var(--text-dim); display: grid; place-items: center; font-size: 16px; }
 .icon-button svg { width: 15px; height: 15px; }
 .icon-button:hover { border-color: var(--accent); color: var(--accent); }
-.view-label { text-align: center; font-size: 9px; color: #737e91; padding-top: 4px; }
 #scene { position: absolute; inset: 0; cursor: grab; outline: none; }
 #scene:active { cursor: grabbing; }
 #scene canvas { display: block; width: 100%; height: 100%; touch-action: none; }
@@ -138,7 +137,7 @@ dialog#help-dialog::backdrop { background: #000a; backdrop-filter: blur(5px); }
 @media (max-width: 600px) {
   .topbar { min-height: 70px; padding: 14px 16px; gap: 8px; }
   .brand { font-size: 13px; gap: 8px; }
-  .brand-icon { width: 25px; height: 25px; }
+  .brand-logo { width: 76px; height: 20px; }
   .brand-caption { font-size: 10px; }
   .quiet-button { padding: 8px; gap: 6px; font-size: 10px; }
   .quiet-button .key { display: none; }

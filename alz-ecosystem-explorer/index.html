@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Azure Landing Zones — Ecosystem Explorer</title>
+<title>Azure Landing Zones — Conceptual Architecture</title>
 <meta name="description" content="Explore Azure Landing Zones in 3D: Platform Services, Platform Landing Zones, and Application Landing Zones.">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","lucide":"https://cdn.jsdelivr.net/npm/lucide@0.468.0/+esm"}}</script>
 </head>
 <body>
   <div class="alz-explorer">
     <header class="topbar">
       <div class="brand">
-        <svg viewBox="0 0 24 24" class="brand-icon" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Zm0 8-10 5 10 5 10-5-10-5Z" fill="currentColor"/></svg>
-        <span>Azure Landing Zones<span class="brand-caption">Ecosystem Explorer</span></span>
+        <img src="assets/insight-logo.svg" class="brand-logo" alt="Insight">
+        <span>Azure Landing Zones<span class="brand-caption">Conceptual Architecture</span></span>
       </div>
       <button class="quiet-button" id="help-button">How to explore <span class="key">?</span></button>
     </header>
@@ -45,7 +45,6 @@
           <button class="icon-button" id="reset-view" title="Reset camera" aria-label="Reset camera"><i data-lucide="rotate-ccw"></i></button>
           <button class="icon-button" id="zoom-in" title="Zoom in" aria-label="Zoom in"><i data-lucide="plus"></i></button>
           <button class="icon-button" id="zoom-out" title="Zoom out" aria-label="Zoom out"><i data-lucide="minus"></i></button>
-          <span class="view-label">ISO</span>
         </div>
         <div id="scene" tabindex="0"></div>
         <div id="hover-label" role="tooltip" hidden></div>
@@ -101,6 +100,6 @@
 
   <noscript><div class="noscript-message">This explorer needs JavaScript.</div></noscript>
 
-  <script type="module" src="app.js?v=41"></script>
+  <script type="module" src="app.js?v=46"></script>
 </body>
 </html>

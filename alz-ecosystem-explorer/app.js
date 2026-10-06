@@ -7,8 +7,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { createIcons, RotateCcw, Plus, Minus, X, ArrowUpRight, ChevronRight } from 'lucide';
-import { LAYERS, findComponent } from './data.js?v=8';
-import { buildTileTexture, buildLayerTexture, buildFlowTexture, buildLabelTexture } from './icons.js?v=19';
+import { LAYERS, findComponent } from './data.js?v=9';
+import { buildTileTexture, buildLayerTexture, buildFlowTexture, buildLabelTexture } from './icons.js?v=21';
 
 function refreshIcons() {
   createIcons({ icons: { RotateCcw, Plus, Minus, X, ArrowUpRight, ChevronRight } });
@@ -62,6 +62,7 @@ camera.position.copy(DEFAULT_CAMERA_POS);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.autoUpdate = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -154,6 +155,7 @@ LAYERS.forEach((layer, layerIndex) => {
     clearcoat: 0.2, clearcoatRoughness: 0.6
   });
   const slab = new THREE.Mesh(slabGeo, slabMat);
+  slab.castShadow = true;
   slab.receiveShadow = true;
   slab.userData = { kind: 'layer', layerId: layer.id };
   group.add(slab);
@@ -174,12 +176,11 @@ LAYERS.forEach((layer, layerIndex) => {
   const n = layer.components.length;
   const spacing = SLAB_WIDTH / (n + 1);
   const baseTileW = 1.65;
-  const baseTileD = 1.8;
+    const baseTileD = 1.65;
   const tileScale = Math.min(1, (spacing - 0.12) / baseTileW);
-  const tileFaceAspect = (baseTileW - 0.12) / (baseTileD - 0.12);
   layer.components.forEach((component, i) => {
     const boxW = baseTileW * tileScale;
-    const boxD = (boxW - 0.12) / tileFaceAspect + 0.12;
+      const boxD = baseTileD * tileScale;
     const boxH = 0.225;
     const geo = new RoundedBoxGeometry(boxW, boxH, boxD, 3, 0.06);
     const mat = new THREE.MeshPhysicalMaterial({
@@ -209,7 +210,16 @@ LAYERS.forEach((layer, layerIndex) => {
     sprite.position.y = boxH / 2 + 0.006;
     mesh.add(sprite);
 
-    componentMeshes.push({ mesh, layer, component, sprite, edge: line2 });
+    const hoverOverlay = new THREE.Mesh(
+      new THREE.PlaneGeometry(boxW - 0.12, boxD - 0.12),
+      new THREE.MeshBasicMaterial({ color: layer.color, transparent: true, opacity: 0.18, depthWrite: false })
+    );
+    hoverOverlay.rotation.x = -Math.PI / 2;
+    hoverOverlay.position.y = boxH / 2 + 0.009;
+    hoverOverlay.visible = false;
+    mesh.add(hoverOverlay);
+
+    componentMeshes.push({ mesh, layer, component, sprite, edge: line2, hoverOverlay });
   });
 });
 
@@ -829,6 +839,7 @@ function tick(now) {
   componentMeshes.forEach(entry => {
     const isHover = entry.mesh === hoveredMesh;
     const isSelected = entry.component.id === currentComponentId;
+    entry.hoverOverlay.visible = isHover;
     entry.edge.material.color.setHex(isHover ? entry.layer.color : 0xffffff);
     entry.edge.material.opacity = isHover ? 0.85 : 0.72;
     if (isHover && !isSelected) {
