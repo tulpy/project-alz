@@ -37,7 +37,7 @@ a { color: var(--accent); }
 .overview-button, .layer-nav-button, .component-nav-button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: 1px solid transparent; color: var(--text); padding: 12px; border-radius: var(--radius); font-size: 12px; }
 .overview-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; flex: 0 0 auto; }
 .overview-button:hover, .layer-nav-button:hover, .component-nav-button:hover { background: #171a25; }
-.overview-button.active { background: var(--accent-soft); border-color: #265951; color: var(--accent); }
+.overview-button.active { background: var(--accent-soft); color: #fff; }
 .nav-section-label { padding-top: 8px; font-size: 10px; color: #81899a; }
 #layer-nav { display: flex; flex-direction: column; gap: 8px; }
 .layer-block { border-bottom: 1px solid var(--border); padding-bottom: 6px; }
@@ -49,14 +49,14 @@ a { color: var(--accent); }
 .layer-chevron { width: 12px; height: 12px; margin-top: 5px; color: var(--text-dim); }
 .layer-nav-button[aria-expanded="true"] .layer-chevron { transform: rotate(90deg); }
 .component-nav-button { position: relative; margin: 2px 0; padding: 8px 10px 8px 44px; font-size: 11px; color: var(--text-dim); }
-.component-nav-button::before { content: ""; position: absolute; left: 20px; width: 4px; height: 4px; background: var(--layer-color); border-radius: 50%; }
+.component-nav-button::before { content: ""; position: absolute; left: 20px; width: 4px; height: 4px; background: var(--layer-color); }
 .component-nav-button.active { color: var(--text); background: var(--accent-soft); }
 .layer-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .nav-bottom { margin-top: auto; padding-top: 24px; font-size: 11px; line-height: 1.7; color: var(--text-dim); }
 .nav-bottom p { margin: 0 0 12px; }
 .nav-bottom a { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
 .nav-bottom svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-.viewport { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #080b12; }
+.viewport { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: var(--bg-elevated); }
 .scene-heading { position: absolute; top: 30px; left: 32px; right: 76px; z-index: 2; pointer-events: none; }
 .breadcrumbs { font-size: 9px; color: var(--accent); display: flex; gap: 6px; flex-wrap: wrap; line-height: 1.6; }
 .breadcrumbs span:not(:last-child)::after { content: "/"; margin-left: 6px; color: var(--text-dim); }
@@ -76,7 +76,7 @@ a { color: var(--accent); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .scene-legend { position: absolute; left: 26px; bottom: 100px; pointer-events: none; font-size: 10px; color: var(--text-dim); }
 .legend-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; }
-.bottom-controls { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px 16px; background: linear-gradient(transparent, #080b12 65%); }
+.bottom-controls { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px 16px; background: linear-gradient(transparent, var(--bg-elevated) 65%); }
 .assembly-controls { display: flex; align-items: center; gap: 18px; max-width: 100%; }
 .segmented { display: flex; flex-shrink: 0; padding: 3px; border: 1px solid var(--border); background: #111520; border-radius: 6px; }
 .segmented button { background: transparent; border: none; color: var(--text-dim); padding: 7px 12px; border-radius: 3px; font-size: 11px; }

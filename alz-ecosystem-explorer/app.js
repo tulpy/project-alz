@@ -7,8 +7,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { createIcons, RotateCcw, Plus, Minus, X, ArrowUpRight, ChevronRight } from 'lucide';
-import { LAYERS, findComponent } from './data.js?v=9';
-import { buildTileTexture, buildLayerTexture, buildFlowTexture, buildLabelTexture } from './icons.js?v=21';
+import { LAYERS, findComponent } from './data.js?v=10';
+import { buildTileTexture, buildLayerTexture, buildLabelTexture, buildCircuitTexture } from './icons.js?v=28';
 
 function refreshIcons() {
   createIcons({ icons: { RotateCcw, Plus, Minus, X, ArrowUpRight, ChevronRight } });
@@ -52,8 +52,8 @@ updateDiscoveryCount();
 
 // ---------- Three.js core ----------
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x080b12);
-scene.fog = new THREE.FogExp2(0x080b12, 0.015);
+scene.background = new THREE.Color(0x0a1628);
+scene.fog = new THREE.FogExp2(0x0a1628, 0.012);
 
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
 const DEFAULT_CAMERA_POS = new THREE.Vector3(9, 8, 11);
@@ -107,18 +107,18 @@ scene.add(rimLight);
 
 // Reflective floor + faint grid for spatial grounding.
 const floor = new THREE.Mesh(
-  new THREE.CircleGeometry(16, 64),
-  new THREE.MeshStandardMaterial({ color: 0x080b12, roughness: 0.95, metalness: 0.05 })
+  new THREE.PlaneGeometry(400, 400),
+  new THREE.MeshBasicMaterial({ color: 0x0a1628 })
 );
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -0.55;
 floor.receiveShadow = true;
 scene.add(floor);
 
-const grid = new THREE.GridHelper(40, 40, 0x263544, 0x18212c);
+const grid = new THREE.GridHelper(160, 160, 0x24445e, 0x1a3448);
 grid.position.y = -0.54;
 grid.material.transparent = true;
-grid.material.opacity = 0.28;
+grid.material.opacity = 0.22;
 scene.add(grid);
 
 function resize() {
@@ -160,6 +160,15 @@ LAYERS.forEach((layer, layerIndex) => {
   slab.userData = { kind: 'layer', layerId: layer.id };
   group.add(slab);
   layerSlabMeshes.push({ mesh: slab, layer });
+
+  const circuitOverlay = new THREE.Mesh(
+    new THREE.PlaneGeometry(SLAB_WIDTH - 0.04, SLAB_DEPTH - 0.04),
+    new THREE.MeshBasicMaterial({ map: buildCircuitTexture(layer.color), transparent: true, depthWrite: false })
+  );
+  circuitOverlay.rotation.x = -Math.PI / 2;
+  circuitOverlay.position.y = SLAB_HEIGHT / 2 + 0.004;
+  circuitOverlay.renderOrder = 1;
+  group.add(circuitOverlay);
 
   const edges = new THREE.EdgesGeometry(slabGeo, 30);
   const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: layer.color, transparent: true, opacity: 0.7 }));
@@ -224,25 +233,20 @@ LAYERS.forEach((layer, layerIndex) => {
 });
 
 // ---------- Crate: when layers collapse into a stack, seal the whole assembly inside one closed box ----------
-const numLayers = LAYERS.length;
-const stackedTopGroupY = (numLayers - 1) * SLAB_HEIGHT; // gap is 0 in stacked mode
 const crateBottomY = -SLAB_HEIGHT / 2;
 const crateWallMargin = 0.22;
-const crateTopClearance = 0.42;
 const crateFootprintW = SLAB_WIDTH + crateWallMargin * 2;
 const crateFootprintD = SLAB_DEPTH + crateWallMargin * 2;
-const crateInteriorTopY = stackedTopGroupY + maxComponentTop;
-const lidThickness = 0.26;
-const crateTopY = crateInteriorTopY + crateTopClearance;
-const crateHeight = (crateTopY + lidThickness / 2) - crateBottomY;
-const crateCenterY = (crateTopY + lidThickness / 2 + crateBottomY) / 2;
+const crateHeight = 0.98;
+const crateTopY = crateBottomY + crateHeight;
+const crateCenterY = crateBottomY + crateHeight / 2;
 
 const crateGroup = new THREE.Group();
 crateGroup.visible = false;
 scene.add(crateGroup);
 
 const crateBodyMat = new THREE.MeshPhysicalMaterial({
-  color: 0x0d1c33,
+  color: 0x123442,
   roughness: 0.55,
   metalness: 0.18,
   clearcoat: 0.35,
@@ -256,17 +260,24 @@ crateBody.receiveShadow = true;
 crateGroup.add(crateBody);
 
 const crateEdges = new THREE.EdgesGeometry(crateBodyGeo, 25);
-const crateOutline = new THREE.LineSegments(crateEdges, new THREE.LineBasicMaterial({ color: 0xc13186, transparent: true, opacity: 0.75 }));
+const crateOutline = new THREE.LineSegments(crateEdges, new THREE.LineBasicMaterial({
+  color: 0xff4fc8,
+  transparent: true,
+  opacity: 0.9,
+  toneMapped: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -1
+}));
 crateOutline.position.y = crateCenterY;
 crateGroup.add(crateOutline);
 
-const labelTexture = buildLabelTexture('Azure Landing Zone', 'Conceptual Architecture');
+const labelTexture = buildLabelTexture('Azure Landing Zones', 'Conceptual Architecture');
 const labelInset = crateWallMargin / 2;
 const labelGeo = new THREE.PlaneGeometry(crateFootprintW - labelInset * 2, crateFootprintD - labelInset * 2);
 const labelMat = new THREE.MeshBasicMaterial({ map: labelTexture, transparent: true, depthWrite: false });
 const labelMesh = new THREE.Mesh(labelGeo, labelMat);
 labelMesh.rotation.x = -Math.PI / 2;
-labelMesh.position.y = crateTopY + lidThickness / 2 + 0.004;
+labelMesh.position.y = crateTopY + 0.004;
 crateGroup.add(labelMesh);
 
 let separation = 0.7;
@@ -284,18 +295,12 @@ function applyLayerFocus() {
   layerGroups.forEach(({ group, layer }) => {
     group.visible = exploded && (!focusedLayerId || layer.id === focusedLayerId);
   });
-  connectionEntries.forEach(conn => {
-    conn.tubeMesh.visible = !focusedLayerId || (
-      conn.from.layer.id === focusedLayerId && conn.to.layer.id === focusedLayerId
-    );
-  });
 }
 
 function applyLayout(animate = true) {
   animations.length = 0;
   const gap = exploded ? separation * MAX_GAP : 0;
   crateGroup.visible = !exploded;
-  tubeGroup.visible = exploded;
   applyLayerFocus();
   layerGroups.forEach(({ group, index }) => {
     const targetY = index * (SLAB_HEIGHT + gap);
@@ -306,7 +311,6 @@ function applyLayout(animate = true) {
     }
   });
   scene.updateMatrixWorld(true);
-  connectionEntries.forEach(conn => rebuildConnectionTube(conn));
   resetCamera(animate);
 }
 function animateY(obj, targetY) {
@@ -339,62 +343,6 @@ function stepCameraAnimation(now) {
   return true;
 }
 
-// ---------- Connection tubes (animated data-flow between related components) ----------
-const seenPairs = new Set();
-const connectionEntries = [];
-LAYERS.forEach(layer => {
-  layer.components.forEach(component => {
-    (component.connections || []).forEach(targetId => {
-      const key = [component.id, targetId].sort().join('|');
-      if (seenPairs.has(key)) return;
-      seenPairs.add(key);
-      const from = componentMeshes.find(c => c.component.id === component.id);
-      const to = componentMeshes.find(c => c.component.id === targetId);
-      if (!from || !to) return;
-      connectionEntries.push({ from, to });
-    });
-  });
-});
-
-const flowTexture = buildFlowTexture(0x2ad0a8);
-const tubeMat = new THREE.MeshBasicMaterial({
-  map: flowTexture, transparent: true, opacity: 0.55, color: 0xbfe8dd, depthWrite: false
-});
-
-const tubeGroup = new THREE.Group();
-scene.add(tubeGroup);
-
-function worldPos(entry, out) {
-  entry.mesh.getWorldPosition(out);
-  return out;
-}
-const tmpA = new THREE.Vector3();
-const tmpB = new THREE.Vector3();
-
-connectionEntries.forEach(conn => {
-  worldPos(conn.from, tmpA);
-  worldPos(conn.to, tmpB);
-  const mid = tmpA.clone().add(tmpB).multiplyScalar(0.5);
-  mid.y += 0.9;
-  const curve = new THREE.CatmullRomCurve3([tmpA.clone(), mid, tmpB.clone()]);
-  const geo = new THREE.TubeGeometry(curve, 24, 0.028, 8, false);
-  const mesh = new THREE.Mesh(geo, tubeMat.clone());
-  mesh.userData = { kind: 'connection' };
-  tubeGroup.add(mesh);
-  conn.tubeMesh = mesh;
-});
-
-function rebuildConnectionTube(conn) {
-  worldPos(conn.from, tmpA);
-  worldPos(conn.to, tmpB);
-  const mid = tmpA.clone().add(tmpB).multiplyScalar(0.5);
-  mid.y += 0.9;
-  const curve = new THREE.CatmullRomCurve3([tmpA.clone(), mid, tmpB.clone()]);
-  const newGeo = new THREE.TubeGeometry(curve, 24, 0.028, 8, false);
-  conn.tubeMesh.geometry.dispose();
-  conn.tubeMesh.geometry = newGeo;
-}
-
 // ---------- Selection state ----------
 let hoveredMesh = null;
 let currentLayerId = null;
@@ -410,14 +358,6 @@ function setEmphasis(entry, on) {
 function clearSelectionVisuals() {
   componentMeshes.forEach(entry => setEmphasis(entry, false));
   layerSlabMeshes.forEach(({ mesh }) => { mesh.material.emissive.setHex(0x000000); });
-  connectionEntries.forEach(conn => { conn.tubeMesh.material.opacity = 0.08; });
-}
-
-function highlightConnectionsFor(componentId) {
-  connectionEntries.forEach(conn => {
-    const involved = conn.from.component.id === componentId || conn.to.component.id === componentId;
-    conn.tubeMesh.material.opacity = involved ? 0.65 : 0.04;
-  });
 }
 
 // ---------- Raycasting ----------
@@ -550,10 +490,10 @@ function renderBreadcrumbs() {
   breadcrumbsEl.innerHTML = '';
   const overviewCrumb = document.createElement('span');
   if (!currentLayerId) {
-    overviewCrumb.textContent = 'PLATFORM OVERVIEW';
+    overviewCrumb.textContent = 'ALZ';
   } else {
     const btn = document.createElement('button');
-    btn.textContent = 'PLATFORM OVERVIEW';
+    btn.textContent = 'ALZ';
     btn.addEventListener('click', showOverview);
     overviewCrumb.appendChild(btn);
   }
@@ -687,7 +627,6 @@ function selectComponent(componentId) {
   clearSelectionVisuals();
   const entry = componentMeshes.find(c => c.component.id === componentId);
   if (entry) setEmphasis(entry, true);
-  highlightConnectionsFor(componentId);
   sceneTitle.textContent = component.name;
   sceneSubtitle.textContent = `Part of ${layer.name}`;
   renderComponentDetail(layer, component);
@@ -758,8 +697,6 @@ function setExploded(next) {
 }
 updateSeparationUI();
 applyLayout(false);
-connectionEntries.forEach(conn => rebuildConnectionTube(conn));
-
 // ---------- View tools ----------
 function resetCamera(animate = false) {
   const focusedGroup = layerGroups.find(({ layer }) => layer.id === focusedLayerId)?.group;
@@ -770,7 +707,9 @@ function resetCamera(animate = false) {
     : modelHeight / 2;
   const verticalRadius = focusedGroup ? focusHalfHeight : modelHeight / 2 + 0.25;
   const center = new THREE.Vector3(0, centerY, 0);
-  const direction = DEFAULT_CAMERA_POS.clone().normalize();
+  const direction = DEFAULT_CAMERA_POS.clone();
+  if (!exploded) direction.y = 11;
+  direction.normalize();
   const framingCamera = camera.clone();
   framingCamera.position.copy(center).add(direction);
   framingCamera.lookAt(center);
@@ -782,6 +721,7 @@ function resetCamera(animate = false) {
     distance = Math.max(distance, Math.abs(corner.x) / (tangent * camera.aspect * 0.85) + corner.z, Math.abs(corner.y) / (tangent * 0.58) + corner.z);
   })));
   if (focusedGroup) distance *= 0.78;
+  else if (!exploded) distance *= 1.1;
   const targetPosition = center.clone().addScaledVector(direction, distance);
   if (animate) {
     cameraAnimation = {
@@ -822,18 +762,12 @@ window.addEventListener('keydown', (e) => {
 });
 
 // ---------- Render loop ----------
-let flowOffset = 0;
 function tick(now) {
   const layoutMoving = stepAnimations(now);
   stepCameraAnimation(now);
   if (layoutMoving) {
     scene.updateMatrixWorld(true);
-    connectionEntries.forEach(conn => rebuildConnectionTube(conn));
   }
-
-  // Animate the flowing dash texture along every connection to suggest live data movement.
-  flowOffset += 0.006;
-  tubeGroup.children.forEach(mesh => { mesh.material.map.offset.x = -flowOffset; });
 
   // Gentle pulse on the hovered component so it feels alive without stealing focus.
   componentMeshes.forEach(entry => {

@@ -117,6 +117,60 @@ const DRAWERS = {
   }
 };
 
+export function buildCircuitTexture(hexColor) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 700;
+  canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  const red = (hexColor >> 16) & 0xff;
+  const green = (hexColor >> 8) & 0xff;
+  const blue = hexColor & 0xff;
+  const traceColor = `rgba(${Math.min(255, red + 80)}, ${Math.min(255, green + 80)}, ${Math.min(255, blue + 55)}, 0.16)`;
+  const padColor = `rgba(${Math.min(255, red + 95)}, ${Math.min(255, green + 95)}, ${Math.min(255, blue + 65)}, 0.22)`;
+  const paths = [
+    [[0, 52], [58, 52], [58, 84], [134, 84]],
+    [[0, 162], [35, 162], [35, 132], [104, 132]],
+    [[0, 352], [72, 352], [72, 316], [164, 316]],
+    [[700, 60], [642, 60], [642, 92], [566, 92]],
+    [[700, 174], [664, 174], [664, 142], [596, 142]],
+    [[700, 346], [626, 346], [626, 310], [536, 310]],
+    [[128, 0], [128, 34], [172, 34], [172, 76]],
+    [[348, 0], [348, 28], [316, 28], [316, 64]],
+    [[570, 0], [570, 42], [532, 42], [532, 78]],
+    [[112, 420], [112, 386], [154, 386], [154, 346]],
+    [[354, 420], [354, 388], [326, 388], [326, 350]],
+    [[586, 420], [586, 382], [548, 382], [548, 344]],
+  ];
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 1.25;
+  ctx.strokeStyle = traceColor;
+  paths.forEach(points => {
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    points.slice(1).forEach(([x, y]) => ctx.lineTo(x, y));
+    ctx.stroke();
+  });
+
+  paths.forEach(points => {
+    const [x, y] = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = padColor;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#18212d';
+    ctx.fill();
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
 export function buildTileTexture(component, hexColor) {
   const canvas = document.createElement('canvas');
   canvas.width = 384;
@@ -129,19 +183,23 @@ export function buildTileTexture(component, hexColor) {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#edf2f7';
   ctx.font = '600 48px "Segoe UI", sans-serif';
-  const words = component.name.split(' ');
   const lines = [];
-  let line = '';
-  words.forEach(word => {
-    const candidate = line ? `${line} ${word}` : word;
-    if (ctx.measureText(candidate).width > canvas.width - 36 && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = candidate;
-    }
-  });
-  lines.push(line);
+  if (component.id === 'azure-policy') {
+    lines.push('Azure', 'Policy');
+  } else {
+    const words = component.name.split(' ');
+    let line = '';
+    words.forEach(word => {
+      const candidate = line ? `${line} ${word}` : word;
+      if (ctx.measureText(candidate).width > canvas.width - 36 && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    });
+    lines.push(line);
+  }
   const iconSize = 160;
   const iconLeft = (canvas.width - iconSize) / 2;
   const textLineHeight = 56;
@@ -239,8 +297,8 @@ export function buildLabelTexture(title, subtitle) {
   canvas.height = height;
   const ctx = canvas.getContext('2d');
 
-  const border = 6;
-  ctx.strokeStyle = '#c13186';
+  const border = 3;
+  ctx.strokeStyle = '#ff4fc8';
   ctx.lineWidth = border;
   ctx.strokeRect(border / 2, border / 2, width - border, height - border);
 
@@ -250,7 +308,7 @@ export function buildLabelTexture(title, subtitle) {
   ctx.font = '700 88px Inter, -apple-system, sans-serif';
   ctx.fillText(title, width / 2, height / 2 - 22);
 
-  ctx.fillStyle = '#c13186';
+  ctx.fillStyle = '#ff4fc8';
   ctx.font = '600 34px Inter, -apple-system, sans-serif';
   ctx.font = '600 34px Inter, -apple-system, sans-serif';
   ctx.fillText(subtitle.toUpperCase(), width / 2, height / 2 + 56);
